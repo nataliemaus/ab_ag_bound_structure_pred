@@ -1,6 +1,7 @@
 import pandas as pd 
 import glob 
 import numpy as np 
+import os 
 from utils.mutate_utils import get_mutations_convert_seq1_to_seq2
 from utils.refine_pose import refine_pose 
 from utils.mutate_pose import mutate_residues 
@@ -9,8 +10,8 @@ from utils.get_spearman_coeff import get_spearman_r
 from utils.scatter_plot import scatter_plot
 from constants import PARENTAL_ID_TO_AA_SEQ
 
-# do fewer sequences and poses to more quickly check the the whole pipeline works 
-DEBUG_MODE = True 
+# Deubg --> do fewer sequences and poses to more quickly check the the whole pipeline works 
+DEBUG_MODE = False 
 
 def get_mutations(
     parental_seq,
@@ -72,7 +73,9 @@ def main(
         if make_scatter_plots:
             plot_filename = pose_path.split("/")[-1].replace(".pdb", ".png")
             rounded_spearman_r = round(spearman_r, 3)
-            scatter_plot(
+            if not os.path.exists(save_plots_dir):
+                os.mkdir(save_plots_dir) 
+            scatter_plot( 
                 x=binding_energies_per_seq, 
                 y=kd_per_seq, 
                 x_label="Rosetta Binding Energy", 
@@ -91,12 +94,17 @@ def main(
 
 
 if __name__ == "__main__":
-    # NOTE: run load_data.py first to save pillbox cfps data locally 
+    results_dir = "pillbox/results"
+    if not os.path.exists(results_dir):
+        os.mkdir(results_dir) 
     relevant_parentals = ["A38781", "A34467"]
     for parental in relevant_parentals:
         cfps_data_path = f"pillbox/pillbox_{parental}_human_cfps.csv"
         parental_seq = PARENTAL_ID_TO_AA_SEQ[parental]
-        save_correlations_csv_path = f"pillbox/results/{parental}/{parental}_hdock_round1_poses_correlation_results.csv"
+        parental_results_dir = f"{results_dir}/{parental}"
+        if not os.path.exists(parental_results_dir):
+            os.mkdir(parental_results_dir) 
+        save_correlations_csv_path = f"{parental_results_dir}/{parental}_hdock_round1_poses_correlation_results.csv"
         paths_to_round1_hdock_predicted_poses = glob.glob(f"pillbox/HDOCK_results/hdock_preds_{parental}/*.pdb")
         if DEBUG_MODE:
             paths_to_round1_hdock_predicted_poses = paths_to_round1_hdock_predicted_poses[0:3]
@@ -106,6 +114,8 @@ if __name__ == "__main__":
             parental_seq=parental_seq,
             save_correlations_csv_path=save_correlations_csv_path,
             make_scatter_plots=True,
-            save_plots_dir=f"pillbox/results/{parental}/plots/"
+            save_plots_dir=f"{parental_results_dir}/plots/"
         )
 
+        # tmux new -s pillbox
+        # python3 run_pipeline.py 
