@@ -158,7 +158,7 @@ if __name__ == "__main__":
         skip_refinement=skip_refinement,
     )
 
-    # Currently running in debug mode with refinement to confirm this works now that I'm not passing in lig.pdb file 
+    # Ran in debug mode with refinement to confirm this works now that I'm not passing in lig.pdb file :) yay
         # tmux new -s pillbox
         # python3 run_pipeline.py 
         # tmux new -s her2

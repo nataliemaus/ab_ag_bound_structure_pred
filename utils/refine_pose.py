@@ -117,17 +117,6 @@ def write_constraint_cst_file_from_pose(
         else:
             chain_nums["ab"].append(chain_num) 
 
-    if not ("ag" in chain_nums):
-        import pdb 
-        pdb.set_trace()
-        # I think this happened bc I accidently tried to run on lig.pdb file!
-        # TODO: investiage why this happened... 
-
-        # (Pdb) chain_nums
-        # {'ab': [1, 2]}
-        # (Pdb) pose.num_chains()
-        # 2
-        # wtfff 
 
     # Used to get aa seqs for each chain for her2... 
     # aa_seqs = []
