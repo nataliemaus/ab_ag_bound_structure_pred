@@ -3,6 +3,7 @@ import glob
 import numpy as np 
 import os 
 import copy 
+import argparse 
 from utils.mutate_utils import get_mutations_convert_seq1_to_seq2
 from utils.refine_pose import refine_pose 
 from utils.mutate_pose import mutate_residues 
@@ -221,4 +222,4 @@ if __name__ == "__main__":
 
     # python3 run_pipeline_her2_parallel.py --organize_data False --hdock_pose_num 1 
     # python3 run_pipeline_her2_parallel.py --organize_data True  
-    
+    # tmux new -s ab1 - 100 ... 
