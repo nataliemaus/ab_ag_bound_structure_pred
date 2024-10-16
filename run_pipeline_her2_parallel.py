@@ -105,35 +105,37 @@ def organize_data(
     # for each pose in list, compute kd-energy spearman correlation coeff 
     save_plots_dir = f"{results_dir}/plots/"
     correlation_coeffs = []
+    run_pose_paths = [] # paths to poses we've actually run main on to collect data 
     for hdock_pose_path in hdock_pose_paths_list:
         pose_data_path = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
         pose_data_path = f"{results_dir}/{pose_data_path}"
-
-        pose_df = pd.read_csv(pose_data_path)
-        binding_energies_per_seq = pose_df["energy"].values 
-        affinity_per_seq = pose_df["affinity"].values 
-        spearman_r = get_spearman_r(affinity_per_seq,binding_energies_per_seq)
-    
-        if make_scatter_plots:
-            plot_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".png")
-            rounded_spearman_r = round(spearman_r, 3)
-            
-            if not os.path.exists(save_plots_dir):
-                os.mkdir(save_plots_dir) 
-            scatter_plot( 
-                x=binding_energies_per_seq, 
-                y=affinity_per_seq, 
-                x_label="Rosetta Binding Energy", 
-                y_label="Affinity", 
-                title=f"KD-Energy Correlation Spearman Coeff = {rounded_spearman_r}", 
-                path_to_save_plot=f"{save_plots_dir}{plot_filename}", 
-            )
-        correlation_coeffs.append(spearman_r)
+        if os.path.exists(pose_data_path):
+            pose_df = pd.read_csv(pose_data_path)
+            binding_energies_per_seq = pose_df["energy"].values 
+            affinity_per_seq = pose_df["affinity"].values 
+            spearman_r = get_spearman_r(affinity_per_seq,binding_energies_per_seq)
+        
+            if make_scatter_plots:
+                plot_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".png")
+                rounded_spearman_r = round(spearman_r, 3)
+                
+                if not os.path.exists(save_plots_dir):
+                    os.mkdir(save_plots_dir) 
+                scatter_plot( 
+                    x=binding_energies_per_seq, 
+                    y=affinity_per_seq, 
+                    x_label="Rosetta Binding Energy", 
+                    y_label="Affinity", 
+                    title=f"KD-Energy Correlation Spearman Coeff = {rounded_spearman_r}", 
+                    path_to_save_plot=f"{save_plots_dir}{plot_filename}", 
+                )
+            correlation_coeffs.append(spearman_r)
+            run_pose_paths.append(hdock_pose_path)
         
 
     save_df = {}
     save_df["kd_energy_spearman_r"] = np.array(correlation_coeffs)
-    save_df["pose_path"] = np.array(hdock_pose_paths_list)
+    save_df["pose_path"] = np.array(run_pose_paths)
     save_df = pd.DataFrame.from_dict(save_df)
     save_df = save_df.sort_values(by=["kd_energy_spearman_r"], ascending=False)
     save_df.to_csv(save_correlations_csv_path, index=None)
@@ -220,6 +222,8 @@ if __name__ == "__main__":
     #   NOTE: can also run organize_data in the middle to see what it looks like before killing... 
 
 
-    # python3 run_pipeline_her2_parallel.py --organize_data False --hdock_pose_num 1 
+    # pose nums 1-10 running on Locust # tmux new -s ab1 , ... ab10 
+    # NOTE: goal is to get 10-20 or so we don't need all 100, just has to include #3 ... 
+    # python3 run_pipeline_her2_parallel.py --organize_data False --hdock_pose_num 10
     # python3 run_pipeline_her2_parallel.py --organize_data True  
-    # tmux new -s ab1 - 100 ... 
+    
