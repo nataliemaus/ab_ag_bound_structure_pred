@@ -3,7 +3,7 @@ from utils.mutate_utils import get_mutations_convert_seq1_to_seq2
 from utils.mutate_pose import mutate_residues
 from utils.refine_pose import refine_pose  
 from utils.score_pose import get_score_function 
-from constants import PARENTAL_ID_TO_AA_SEQ
+from constants import PARENTAL_ID_TO_AB_SEQ
 
 
 class AffinityStructureObjective():
@@ -14,6 +14,7 @@ class AffinityStructureObjective():
         self,
         hdock_poses_list, # list of paths to hdock poses 
         parental_seq,
+        parental,
         affinity_weight=1.0,
         n_mutations_threshold=5,
         refinement_minimization_iter=100,
@@ -27,6 +28,7 @@ class AffinityStructureObjective():
         self.refinement_minimization_iter = refinement_minimization_iter
         self.energy_sfxn = get_score_function()
         self.variance_normalizing_constant = variance_normalizing_constant
+        self.parental = parental
 
 
     def bighat_affinity_oracle_wrapper(self, x_list):
@@ -65,6 +67,7 @@ class AffinityStructureObjective():
         for pose_path_i in self.hdock_poses_list:
             mutated_pose = mutate_residues(
                 path_to_pdb=pose_path_i,
+                parental=self.parental,
                 mutant_positions=positions_list, 
                 mutant_aas=aas_list, 
                 save_mutated_pdb=False,
@@ -72,6 +75,7 @@ class AffinityStructureObjective():
             refined_pose = refine_pose(
                 pose=mutated_pose,
                 minimization_iter=self.refinement_minimization_iter,
+                parental=self.parental,
             ) 
             binding_energy = self.energy_sfxn(refined_pose) 
             print(binding_energy)
@@ -94,7 +98,8 @@ if __name__ == "__main__":
     ]
     obj = AffinityStructureObjective(
         hdock_poses_list=hdock_poses_list,
-        parental_seq = PARENTAL_ID_TO_AA_SEQ["A38781"], 
+        parental_seq = PARENTAL_ID_TO_AB_SEQ["A38781"], 
+        parental = "A38781",
         refinement_minimization_iter=10, # smaller n iters for quick testing 
     )
     seqs = [

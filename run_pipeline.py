@@ -8,7 +8,7 @@ from utils.mutate_pose import mutate_residues
 from utils.score_pose import get_score_function
 from utils.get_spearman_coeff import get_spearman_r
 from utils.scatter_plot import scatter_plot
-from constants import PARENTAL_ID_TO_AA_SEQ
+from constants import PARENTAL_ID_TO_AB_SEQ
 
 # Deubg --> do fewer sequences and poses to more quickly check the the whole pipeline works 
 DEBUG_MODE = False 
@@ -31,6 +31,7 @@ def get_mutations(
 
 def main(
     paths_to_poses_list,
+    parental,
     cfps_data_path,
     parental_seq,
     save_correlations_csv_path,
@@ -59,12 +60,14 @@ def main(
         for ix, mutatnt_positions_list in enumerate(mutatant_positions_per_seq):
             mutated_pose = mutate_residues(
                 path_to_pdb=pose_path,
+                parental=parental,
                 mutant_positions=mutatnt_positions_list,
                 mutant_aas=mutatant_aas_per_seq[ix],
                 save_mutated_pdb=False,
             )
             refined_pose = refine_pose(
                 pose=mutated_pose,
+                parental=parental,
             ) 
             binding_energy = energy_sfxn(refined_pose) 
             binding_energies_per_seq.append(binding_energy)
@@ -100,7 +103,7 @@ if __name__ == "__main__":
     relevant_parentals = ["A38781", "A34467"]
     for parental in relevant_parentals:
         cfps_data_path = f"pillbox/pillbox_{parental}_human_cfps.csv"
-        parental_seq = PARENTAL_ID_TO_AA_SEQ[parental]
+        parental_seq = PARENTAL_ID_TO_AB_SEQ[parental]
         parental_results_dir = f"{results_dir}/{parental}"
         if not os.path.exists(parental_results_dir):
             os.mkdir(parental_results_dir) 
@@ -112,6 +115,7 @@ if __name__ == "__main__":
             paths_to_poses_list=paths_to_round1_hdock_predicted_poses,
             cfps_data_path=cfps_data_path,
             parental_seq=parental_seq,
+            parental=parental,
             save_correlations_csv_path=save_correlations_csv_path,
             make_scatter_plots=True,
             save_plots_dir=f"{parental_results_dir}/plots/"

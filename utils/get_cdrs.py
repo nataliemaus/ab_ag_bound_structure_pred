@@ -3,7 +3,7 @@ from tqdm import tqdm
 from abnumber import Chain
 from functools import partial
 AHO_MAX_LEN = 152  # AHo has a fixed maximum length of sequences
-from constants import PARENTAL_ID_TO_AA_SEQ
+from constants import PARENTAL_ID_TO_AB_SEQ
 
 
 def get_cdrs(sequence, gap_character="-"):
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     for parental in parentals:
         print(f"\n {parental}")
     
-        seq = PARENTAL_ID_TO_AA_SEQ[parental]
+        seq = PARENTAL_ID_TO_AB_SEQ[parental]
 
         idxs, seqs = get_cdrs(sequence=seq, gap_character="-")
         for cdr_n in [1,2,3]:

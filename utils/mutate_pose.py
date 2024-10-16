@@ -1,7 +1,7 @@
 import os 
 import sys 
 sys.path.append("../")
-from constants import ANTIGEN_SEQ
+from constants import PARENTAL_ID_TO_AG_SEQ 
 from utils.load_pose import load_pose 
 import pyrosetta 
 pyrosetta.init()
@@ -9,18 +9,20 @@ pyrosetta.init()
 
 def mutate_residues(
     path_to_pdb,
+    parental,
     mutant_positions=[1,2], 
     mutant_aas=["A","A"], 
     save_mutated_pdb=False,
 ):
     pose = load_pose(path_to_pdb=path_to_pdb,)
+    ag_seq = PARENTAL_ID_TO_AG_SEQ[parental]
 
     # First, we check if the antigen comes first, and if so modify the mutation positions accordingly
     input_seq = pose.sequence()
-    if input_seq.startswith(ANTIGEN_SEQ):
+    if input_seq.startswith(ag_seq):
         temp = []
         for og_mutant_pos in mutant_positions:
-            temp.append(og_mutant_pos + len(ANTIGEN_SEQ) )
+            temp.append(og_mutant_pos + len(ag_seq) )
         mutant_positions = temp  
 
     # make each mutaiton passed in 

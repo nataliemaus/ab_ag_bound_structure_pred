@@ -11,12 +11,10 @@ import pandas as pd
 import sys 
 sys.path.append("../")
 from utils.load_pose import load_pose 
-from constants import ANTIGEN_SEQ, aa_1_to_3
+from constants import PARENTAL_ID_TO_AG_SEQ, aa_1_to_3, aa_3_to_1, PARENTAL_ID_TO_CDR_INDEXES
 from pyrosetta import rosetta
 from rosetta.protocols.rigid import RigidBodyTransMover
 import numpy as np 
-
-CDR_INDEXES = np.arange(25, 32).tolist() + np.arange(51, 56).tolist() + np.arange(97, 106).tolist()
 
 init_string = "-mute all -ignore_zero_occupancy false -detect_disulf true -detect_disulf_tolerance 1.5 -check_cdr_chainbreaks false"
 pyrosetta.init(init_string, silent=True)
@@ -97,6 +95,7 @@ def write_list_of_lines_to_file(filepath, list_of_lines):
 
 def write_constraint_cst_file_from_pose(
     pose, 
+    parental,
     save_path_constraint_cst_file, 
     harmonic_std=0.0001,
 ):
@@ -104,55 +103,101 @@ def write_constraint_cst_file_from_pose(
     if os.path.exists(save_path_constraint_cst_file):
         os.remove(save_path_constraint_cst_file)
 
+    ag_seq = PARENTAL_ID_TO_AG_SEQ[parental]
+
     # ab and ag 
-    assert pose.num_chains() == 2
-    first_aa_chain_1 = pose.residue(pose.chain_begin(1)).name()
-    first_aa_chain_2 = pose.residue(pose.chain_begin(2)).name()
+    # 2 chains for pillbox, 3 chains for her2 (her2 has 2 ab chains)
+    chain_nums = {
+        "ab":[],
+    }
+    for chain_num in range(1, pose.num_chains()+1):
+        first_aa_in_chain = pose.residue(pose.chain_begin(chain_num)).name()
+        if first_aa_in_chain.startswith(aa_1_to_3[ag_seq[0]]): # if chian is ag 
+            chain_nums["ag"] = chain_num  
+        else:
+            chain_nums["ab"].append(chain_num) 
 
-    if first_aa_chain_1.startswith(aa_1_to_3[ANTIGEN_SEQ[0]]):
-        ag_chain_num = 1
-        ab_chain_num = 2
-    else:
-        ag_chain_num = 2
-        ab_chain_num = 1
-        assert first_aa_chain_2.startswith(aa_1_to_3[ANTIGEN_SEQ[0]])
+    if not ("ag" in chain_nums):
+        import pdb 
+        pdb.set_trace()
+        # I think this happened bc I accidently tried to run on lig.pdb file!
+        # TODO: investiage why this happened... 
 
-    res_num_start = pose.chain_begin(ag_chain_num)
-    res_num_end = pose.chain_end(ag_chain_num)
+        # (Pdb) chain_nums
+        # {'ab': [1, 2]}
+        # (Pdb) pose.num_chains()
+        # 2
+        # wtfff 
 
-    ag_res_num_start = pose.chain_begin(ab_chain_num)
-    ag_cdr_nums = [idx + ag_res_num_start for idx in CDR_INDEXES]
-    ag_res_num_end = pose.chain_end(ab_chain_num)
-    constraint_lines = []
+    # Used to get aa seqs for each chain for her2... 
+    # aa_seqs = []
+    # for chain_num in chain_nums["ab"]:
+    #     aa_seq = ""
+    #     for res_num in range(pose.chain_begin(chain_num), pose.chain_end(chain_num)+1):
+    #         res1 = pose.residue(res_num).name()
+    #         res1 = res1.split(":")[0]
+    #         aa_1 = aa_3_to_1[res1]
+    #         aa_seq += aa_1 
+    #     aa_seqs.append(aa_seq)
 
-    # add constraints to non-cdr ab residues: 
+
+
+    # first_aa_chain_1 = pose.residue(pose.chain_begin(1)).name()
+    # first_aa_chain_2 = pose.residue(pose.chain_begin(2)).name()
+
+    
+    # if first_aa_chain_1.startswith(aa_1_to_3[ag_seq[0]]):
+    #     ag_chain_num = 1
+    #     ab_chain_num = 2
+    # else:
+    #     ag_chain_num = 2
+    #     ab_chain_num = 1
+    #     assert first_aa_chain_2.startswith(aa_1_to_3[ag_seq[0]])
+
+    
+
+    cdr_chain_id, cdr_indexes = PARENTAL_ID_TO_CDR_INDEXES[parental]
+
+    for ix, ab_chain_num in enumerate(chain_nums["ab"]):
+        ab_res_num_start = pose.chain_begin(ab_chain_num)
+        if ix == cdr_chain_id:
+            ab_cdr_nums = [idx + ab_res_num_start for idx in cdr_indexes]
+        else:
+            ab_cdr_nums = []
+        ab_res_num_end = pose.chain_end(ab_chain_num)
+        constraint_lines = []
+
+        # add constraints to non-cdr ab residues: 
+        pairs_added = []
+        for res_n1 in range(ab_res_num_start, ab_res_num_end+1):
+            res1 = pose.residue(res_n1)
+            for res_n2 in range(ab_res_num_start, ab_res_num_end+1):
+                # if not cdr
+                if (res_n1 not in ab_cdr_nums) and (res_n2 not in ab_cdr_nums):
+                    # if not same residue 
+                    if (res_n1 != res_n2):
+                        # if not constraint already added 
+                        if (res_n1, res_n2) not in pairs_added:
+                            res2 = pose.residue(res_n2)
+                            # just constraint between first pair of atoms 
+                            atom_name1 = res1.atom_name(1).replace(" ", "") # remove white space 
+                            atom_name2 = res2.atom_name(1).replace(" ", "") 
+                            atom1_location = res1.atom(1).xyz() 
+                            atom2_location = res2.atom(1).xyz() 
+                            dst_pair = atom1_location.distance(atom2_location) 
+                            c_line = f"AtomPair {atom_name1} {res_n1} {atom_name2} {res_n2} HARMONIC {dst_pair} {harmonic_std}\n"
+                            constraint_lines.append(c_line)
+                            pairs_added.append((res_n1, res_n2))
+                            pairs_added.append((res_n2, res_n1))
+
+
+    # Add constraints to all residues in ag (don't allow ag to move): 
+    ag_res_num_start = pose.chain_begin(chain_nums["ag"])
+    ag_res_num_end = pose.chain_end(chain_nums["ag"])
     pairs_added = []
     for res_n1 in range(ag_res_num_start, ag_res_num_end+1):
         res1 = pose.residue(res_n1)
         for res_n2 in range(ag_res_num_start, ag_res_num_end+1):
-            # if not cdr
-            if (res_n1 not in ag_cdr_nums) and (res_n2 not in ag_cdr_nums):
-                # if not same residue 
-                if (res_n1 != res_n2):
-                    # if not constraint already added 
-                    if (res_n1, res_n2) not in pairs_added:
-                        res2 = pose.residue(res_n2)
-                        # just constraint between first pair of atoms 
-                        atom_name1 = res1.atom_name(1).replace(" ", "") # remove white space 
-                        atom_name2 = res2.atom_name(1).replace(" ", "") 
-                        atom1_location = res1.atom(1).xyz() 
-                        atom2_location = res2.atom(1).xyz() 
-                        dst_pair = atom1_location.distance(atom2_location) 
-                        c_line = f"AtomPair {atom_name1} {res_n1} {atom_name2} {res_n2} HARMONIC {dst_pair} {harmonic_std}\n"
-                        constraint_lines.append(c_line)
-                        pairs_added.append((res_n1, res_n2))
-                        pairs_added.append((res_n2, res_n1))
-
-    # Add constraints to all residues in ag (don't allow ag to move): 
-    pairs_added = []
-    for res_n1 in range(res_num_start, res_num_end+1):
-        res1 = pose.residue(res_n1)
-        for res_n2 in range(res_num_start, res_num_end+1):
             if (res_n1 != res_n2):
                 if (res_n1, res_n2) not in pairs_added:
                     res2 = pose.residue(res_n2)
@@ -183,6 +228,7 @@ def apply_constraint(pose, constraints_cst_file_path):
 
 def refine(
     input_pdb_file,
+    parental,
     out_pdb_file=None,
     minimization_iter=100,
     reuse_existing_pdbs=True,
@@ -203,6 +249,7 @@ def refine(
         path_constraint_cst_file = input_pdb_file.replace(".pdb", f"_constraints.cst")
         write_constraint_cst_file_from_pose(
             pose=pose, 
+            parental=parental,
             save_path_constraint_cst_file=path_constraint_cst_file,
             harmonic_std=harmonic_std,
         )
@@ -241,6 +288,7 @@ def refine(
 
 def refine_pose(
     pose,
+    parental,
     minimization_iter=100,
     refine_cdrs_only=True,
     harmonic_std=0.0001, 
@@ -249,6 +297,7 @@ def refine_pose(
         path_constraint_cst_file = "temp_constraints.cst"
         write_constraint_cst_file_from_pose(
             pose=pose, 
+            parental=parental,
             save_path_constraint_cst_file=path_constraint_cst_file,
             harmonic_std=harmonic_std,
         )

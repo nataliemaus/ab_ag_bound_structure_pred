@@ -1,7 +1,7 @@
 import os 
 import sys 
 sys.path.append("../")
-from constants import PARENTAL_ID_TO_AA_SEQ
+from constants import PARENTAL_ID_TO_AB_SEQ
 import pyrosetta 
 pyrosetta.init()
 
