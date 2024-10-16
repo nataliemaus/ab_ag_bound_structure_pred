@@ -82,18 +82,20 @@ def main(
         binding_energy = energy_sfxn(refined_pose) 
         binding_energies_per_seq.append(binding_energy)
 
-        n_so_far = en(binding_energies_per_seq)
+        n_so_far = len(binding_energies_per_seq)
+        be_array_so_far = np.array(binding_energies_per_seq)
+        affinities_so_far = np.array(affinity_per_seq[0:n_so_far])
         if n_so_far > 2:
-            be_array_so_far = np.array(binding_energies_per_seq)
-            affinities_so_far = np.array(affinity_per_seq[0:n_so_far])
             spearman_r_so_far = get_spearman_r(affinities_so_far,be_array_so_far)
+        else:
+            spearman_r_so_far = -100
 
-            save_df = {}
-            save_df["energy"] = be_array_so_far
-            save_df["affinity"] = affinities_so_far
-            save_df["spearman_r"] = np.array([spearman_r_so_far]*n_so_far)
-            save_df = pd.DataFrame.from_dict(save_df)
-            save_df.to_csv(save_data_path, index=None)
+        save_df = {}
+        save_df["energy"] = be_array_so_far
+        save_df["affinity"] = affinities_so_far
+        save_df["spearman_r"] = np.array([spearman_r_so_far]*n_so_far)
+        save_df = pd.DataFrame.from_dict(save_df)
+        save_df.to_csv(save_data_path, index=None)
 
 
 def organize_data(
