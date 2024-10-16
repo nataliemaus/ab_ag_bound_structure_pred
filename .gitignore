@@ -10,3 +10,4 @@ __pycache__/*
 *.ent 
 !her2/hdock_her2/model_*.pdb
 !her2/known_binding_pose/*
+!her2/affinity_data_cdr3.csv
