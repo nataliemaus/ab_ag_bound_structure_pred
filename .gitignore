@@ -6,3 +6,7 @@ pillbox/
 pillbox/* 
 __pycache__/
 __pycache__/* 
+*.out
+*.ent 
+!her2/hdock_her2/model_*.pdb
+!her2/known_binding_pose/*
