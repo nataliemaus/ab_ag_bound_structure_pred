@@ -15,12 +15,16 @@ https://github.com/nataliemaus/ab_ag_bound_structure_pred
 
 tmux attach -t ab1 - 20 
 
-runai submit ab20 -v /home/nmaus/ab_ag_bound_structure_pred:/home/nmaus/ab_ag_bound_structure_pred --working-dir /home/nmaus/ab_ag_bound_structure_pred -i haydnj/torch:bayes-lqo -g 0 -e WANDB_API_KEY=fa9b0336bc46ee548faf75673c4f4ec5b461edb4 --interactive --attach
+runai submit ab1 -v /home/nmaus/ab_ag_bound_structure_pred:/home/nmaus/ab_ag_bound_structure_pred --working-dir /home/nmaus/ab_ag_bound_structure_pred -i haydnj/torch:bayes-lqo -g 0 -e WANDB_API_KEY=fa9b0336bc46ee548faf75673c4f4ec5b461edb4 --interactive --attach
 
-runai attach ab20
+runai attach ab1
 
 pip install Bio
 pip3 install pyrosetta-installer 
 python3 -c 'import pyrosetta_installer; pyrosetta_installer.install_pyrosetta()'
 
 python3 run_pipeline_her2_parallel.py --organize_data False --hdock_pose_num 2
+
+python3 run_pipeline_her2_parallel.py --organize_data True 
+
+Done and organized on locust for models 1-40, correlations bad 
