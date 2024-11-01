@@ -35,7 +35,7 @@ def main(
     parental_seq,
     results_dir,
     affinity_data_seq_col="HCDR3",
-    affinity_data_label_col="kd",
+    affinity_data_label_col="-log(KD (M))",
     skip_refinement=True,
 ):
     save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
@@ -46,8 +46,6 @@ def main(
     new_cdr3s = df[affinity_data_seq_col].values # .tolist()
     seqs_list = []
     for new_cdr3 in new_cdr3s:
-        import pdb 
-        pdb.set_trace()
         new_seq = copy.deepcopy(parental_seq)
         new_seq = [char for char in new_seq]
         new_cdr3 = [char for char in new_cdr3]
@@ -203,7 +201,7 @@ if __name__ == "__main__":
             results_dir=results_dir,
             skip_refinement=args.skip_refinement,
             affinity_data_seq_col="HCDR3",
-            affinity_data_label_col="kd", # remated from "KD (nM),-log(KD (M))""
+            affinity_data_label_col="-log(KD (M))",
         )
     else: # run organize data 
         # get all hdock pdb paths 
