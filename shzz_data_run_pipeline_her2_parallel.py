@@ -43,9 +43,11 @@ def main(
 
     df = pd.read_csv(affinity_data_path)
 
-    new_cdr3s = df[affinity_data_seq_col].values.tolist()
+    new_cdr3s = df[affinity_data_seq_col].values # .tolist()
     seqs_list = []
     for new_cdr3 in new_cdr3s:
+        import pdb 
+        pdb.set_trace()
         new_seq = copy.deepcopy(parental_seq)
         new_seq = [char for char in new_seq]
         new_cdr3 = [char for char in new_cdr3]
