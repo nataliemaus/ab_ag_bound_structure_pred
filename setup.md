@@ -23,8 +23,19 @@ pip install Bio
 pip3 install pyrosetta-installer 
 python3 -c 'import pyrosetta_installer; pyrosetta_installer.install_pyrosetta()'
 
+
+# TODO: 
+python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 10
+python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement True --organize_data True  
+
+python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement False --organize_data False --hdock_pose_num 10
+python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement False --organize_data True  
+
+
+
+
+# ------------------------
+# DONE: 
 python3 run_pipeline_her2_parallel.py --organize_data False --hdock_pose_num 2
 
 python3 run_pipeline_her2_parallel.py --organize_data True 
-
-Done and organized on locust for models 1-40, correlations bad 
