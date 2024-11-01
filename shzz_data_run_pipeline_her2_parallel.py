@@ -35,7 +35,7 @@ def main(
     parental_seq,
     results_dir,
     affinity_data_seq_col="HCDR3",
-    affinity_data_label_col="KD (nM),-log(KD (M))",
+    affinity_data_label_col="kd",
     skip_refinement=True,
 ):
     save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
@@ -201,7 +201,7 @@ if __name__ == "__main__":
             results_dir=results_dir,
             skip_refinement=args.skip_refinement,
             affinity_data_seq_col="HCDR3",
-            affinity_data_label_col="KD (nM),-log(KD (M))",
+            affinity_data_label_col="kd", # remated from "KD (nM),-log(KD (M))""
         )
     else: # run organize data 
         # get all hdock pdb paths 
