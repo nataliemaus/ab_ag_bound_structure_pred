@@ -15,6 +15,7 @@ from constants import PARENTAL_ID_TO_AG_SEQ, aa_1_to_3, aa_3_to_1, PARENTAL_ID_T
 from pyrosetta import rosetta
 from rosetta.protocols.rigid import RigidBodyTransMover
 import numpy as np 
+import uuid
 
 init_string = "-mute all -ignore_zero_occupancy false -detect_disulf true -detect_disulf_tolerance 1.5 -check_cdr_chainbreaks false"
 pyrosetta.init(init_string, silent=True)
@@ -283,7 +284,8 @@ def refine_pose(
     harmonic_std=0.0001, 
 ):  
     if refine_cdrs_only:
-        path_constraint_cst_file = "temp_constraints.cst"
+        random_string = str(uuid.uuid4())
+        path_constraint_cst_file = f"temp_constraints_{random_string}.cst"
         write_constraint_cst_file_from_pose(
             pose=pose, 
             parental=parental,
