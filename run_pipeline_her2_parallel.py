@@ -36,6 +36,7 @@ def main(
     results_dir,
     skip_refinement=True,
 ):
+    assert 0, "make sure to switch cdr3 in constants back to length 10 one for this dataset!"
     save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
     save_data_path = f"{results_dir}/{save_filename}"
 

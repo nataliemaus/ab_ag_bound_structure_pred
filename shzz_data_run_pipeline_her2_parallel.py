@@ -10,7 +10,7 @@ from utils.mutate_pose import mutate_residues
 from utils.score_pose import get_score_function
 from utils.get_spearman_coeff import get_spearman_r
 from utils.scatter_plot import scatter_plot
-from constants import PARENTAL_ID_TO_AB_SEQ, HER2_CDR3_FIRST_INDEX, HER2_CDR3_LAST_INDEX
+from constants import PARENTAL_ID_TO_AB_SEQ, HER2_CDR3_FIRST_INDEX, HER2_CDR3_LAST_INDEX, HER2_CDR_3
 
 def get_mutations(
     parental_seq,
@@ -37,12 +37,23 @@ def main(
     affinity_data_seq_col="HCDR3",
     affinity_data_label_col="-log(KD (M))",
     skip_refinement=True,
+    mutations_only=True,
 ):
     save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
     save_data_path = f"{results_dir}/{save_filename}"
 
-    df = pd.read_csv(affinity_data_path)
+    df = pd.read_csv(affinity_data_path) # (422, 7)
+    len_known_cdr3 = len(HER2_CDR_3)
+    if mutations_only:
+        # only keep new seqs that mutate original --> same length 
+        len_new_cdr3s = [len(seq) for seq in df[affinity_data_seq_col].values]
+        len_new_cdr3s = np.array(len_new_cdr3s)
+        bool_array = len_new_cdr3s == len_known_cdr3
+        df = df[bool_array] # (201,7)
+    else:
+        assert 0, "code not prepped to handle insertions or deletions"
 
+    
     new_cdr3s = df[affinity_data_seq_col].values # .tolist()
     seqs_list = []
     for new_cdr3 in new_cdr3s:
@@ -54,7 +65,7 @@ def main(
         seqs_list.append(new_seq)
     
 
-    affinity_per_seq = df[affinity_data_label_col].values.astype(np.float32) 
+    affinity_per_seq = df[affinity_data_label_col].values.astype(np.float32) # (201,)
     affinity_per_seq = affinity_per_seq.tolist()
 
     mutatant_positions_per_seq, mutatant_aas_per_seq = get_mutations(
