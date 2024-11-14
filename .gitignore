@@ -15,3 +15,4 @@ __pycache__/*
 !her2/Shanehsazzadeh-spr-controls.csv
 .DS_Store
 .DS_Store/*
+her2/hdock_her2/model_*.clean.pdb
