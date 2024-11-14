@@ -36,7 +36,8 @@ def main(
     save_data_path = f"{results_dir}/{save_filename}"
 
     df = pd.read_csv(affinity_data_path) 
-    print("N sequences before removing non-mutations:", df.shape[0])
+    # print("N sequences before removing non-mutations:", df.shape[0])
+    # N sequences before removing non-mutations: 1855
     
     if mutations_only:
         bool_array = np.array([True]*df.shape[0])
@@ -52,9 +53,9 @@ def main(
     else:
         assert 0, "code not prepped to handle insertions or deletions"
 
-    print("N sequences AFTER removing non-mutations:", df.shape[0])
-    import pdb 
-    pdb.set_trace()
+    # print("N sequences AFTER removing non-mutations:", df.shape[0])
+    # N sequences AFTER removing non-mutations: 1266
+
 
     seqs_list = []
     for i in range(df.shape[0]):
@@ -67,9 +68,7 @@ def main(
         new_seq = "".join(new_seq)
         seqs_list.append(new_seq)
 
-    print("got seqs list, check it looks reasonable")
-    import pdb 
-    pdb.set_trace()
+    # Checked: seqs_list has length 1266 and each seq has length 434 but they are not equivalent to eachother 
 
     affinity_per_seq = df[affinity_data_label_col].values.astype(np.float32) 
     affinity_per_seq = affinity_per_seq.tolist()
