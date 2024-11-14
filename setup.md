@@ -28,21 +28,15 @@ python3 -c 'import pyrosetta_installer; pyrosetta_installer.install_pyrosetta()'
 python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 100 
 python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement True --organize_data True  
 
+# DONE: poses 1-20 
 # RUNNING: 
-# ab11-20 -->> poses 1-10 
-# ab1-10 -->> poses 11-20 
-python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement False --organize_data False --hdock_pose_num 11
+# ab1-20 x4 runs each -->> poses 21-40 , 41-60, 61-80, 81-100
+python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement False --organize_data False --hdock_pose_num 60
+python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement False --organize_data False --hdock_pose_num 80
+python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement False --organize_data False --hdock_pose_num 100
 
 # Then: 
 python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement False --organize_data True  
-
-# Previous bug in refinement, now fixed: 
-Traceback (most recent call last):
-    refined_pose = refine_pose(
-  File "/home/nmaus/ab_ag_bound_structure_pred/utils/refine_pose.py", line 298, in refine_pose
-    os.remove(path_constraint_cst_file) 
-FileNotFoundError: [Errno 2] No such file or directory: 'temp_constraints.cst'
-
 
 
 # ------------------------
