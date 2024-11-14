@@ -2,7 +2,7 @@ import pandas as pd
 import glob 
 import numpy as np 
 import os 
-from utils.mutate_utils import get_mutations_convert_seq1_to_seq2
+from utils.get_mutations import get_mutations
 from utils.refine_pose import refine_pose 
 from utils.mutate_pose import mutate_residues 
 from utils.score_pose import get_score_function
@@ -12,21 +12,6 @@ from constants import PARENTAL_ID_TO_AB_SEQ
 
 # Deubg --> do fewer sequences and poses to more quickly check the the whole pipeline works 
 DEBUG_MODE = False 
-
-def get_mutations(
-    parental_seq,
-    seqs_list,
-):
-    mutatant_positions_per_seq, mutatant_aas_per_seq = [], []
-    for mutated_seq in seqs_list:
-        positions_list, aas_list, _ = get_mutations_convert_seq1_to_seq2(
-            seq1=parental_seq,
-            seq2=mutated_seq,
-        )
-        mutatant_positions_per_seq.append(positions_list)
-        mutatant_aas_per_seq.append(aas_list)
-
-    return mutatant_positions_per_seq, mutatant_aas_per_seq 
 
 
 def main(

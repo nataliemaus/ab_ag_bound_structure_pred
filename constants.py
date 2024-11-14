@@ -54,15 +54,38 @@ HER2_AB_CHAINS = [
 # HER2_CDR_3 = "WGGDGFYAMD" # len10, worsk for affinity_data_cdr3.csv (v1 chinnery et al)
 HER2_CDR_3 = "SRWGGDGFYAMDY" # len13 for shzz et al data  (201/422 have length 13, are others insertions or deletions??)
 
+# add for shzz v2 constants_shzz 
+HER2_CDR_1 = "GFNIKDTY"
+HER2_CDR_2 = "IYPTNGYT"
 
-HER2_CDR3_FIRST_INDEX = HER2_AB_CHAINS[1].find(HER2_CDR_3)
-HER2_CDR3_LAST_INDEX = HER2_CDR3_FIRST_INDEX+len(HER2_CDR_3)
-assert HER2_CDR_3 == HER2_AB_CHAINS[1][HER2_CDR3_FIRST_INDEX:HER2_CDR3_LAST_INDEX]
+HER2_CDRS_LIST = [HER2_CDR_1, HER2_CDR_2, HER2_CDR_3 ]
 
-HER3_CDR_INDEXES = np.arange(HER2_CDR3_FIRST_INDEX , HER2_CDR3_LAST_INDEX).tolist()
+HER2_CDR_FIRST_INDEX_LIST = []
+HER2_CDR_LAST_INDEX_LIST = [] 
+for cdr_seq in HER2_CDRS_LIST:
+    first_index = HER2_AB_CHAINS[1].find(cdr_seq)
+    last_index = first_index+len(cdr_seq)
+    assert cdr_seq == HER2_AB_CHAINS[1][first_index:last_index]
+    HER2_CDR_FIRST_INDEX_LIST.append(first_index)
+    HER2_CDR_LAST_INDEX_LIST.append(last_index)
+
+
+# for prev versions that only used CDR3... (before constant_shzz)
+HER2_CDR3_FIRST_INDEX = HER2_CDR_FIRST_INDEX_LIST[-1]
+HER2_CDR3_LAST_INDEX = HER2_CDR_LAST_INDEX_LIST[-1]
+
+# * Used for prev versions (before constant_shzz) --> only cdr 3 allowed to refine... 
+# HER3_CDR_INDEXES = np.arange(HER2_CDR3_FIRST_INDEX , HER2_CDR3_LAST_INDEX).tolist() 
+HER3_CDR_INDEXES = [] 
+for i in range(3):
+    HER3_CDR_INDEXES = HER3_CDR_INDEXES + np.arange(HER2_CDR_FIRST_INDEX_LIST[i], HER2_CDR_LAST_INDEX_LIST[i]).tolist()
 PILLBOX_CDR_INDEXES = np.arange(25, 32).tolist() + np.arange(51, 56).tolist() + np.arange(97, 106).tolist()
 PARENTAL_ID_TO_CDR_INDEXES = {
     "A34467":(0, PILLBOX_CDR_INDEXES),
     "A38781":(0, PILLBOX_CDR_INDEXES),
     "HER2":(1, HER3_CDR_INDEXES),
 }
+
+
+
+

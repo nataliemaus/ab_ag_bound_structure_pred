@@ -4,28 +4,13 @@ import numpy as np
 import os 
 import copy 
 import argparse 
-from utils.mutate_utils import get_mutations_convert_seq1_to_seq2
 from utils.refine_pose import refine_pose 
 from utils.mutate_pose import mutate_residues 
 from utils.score_pose import get_score_function
 from utils.get_spearman_coeff import get_spearman_r
 from utils.scatter_plot import scatter_plot
 from constants import PARENTAL_ID_TO_AB_SEQ, HER2_CDR3_FIRST_INDEX, HER2_CDR3_LAST_INDEX
-
-def get_mutations(
-    parental_seq,
-    seqs_list,
-):
-    mutatant_positions_per_seq, mutatant_aas_per_seq = [], []
-    for mutated_seq in seqs_list:
-        positions_list, aas_list, _ = get_mutations_convert_seq1_to_seq2(
-            seq1=parental_seq,
-            seq2=mutated_seq,
-        )
-        mutatant_positions_per_seq.append(positions_list)
-        mutatant_aas_per_seq.append(aas_list)
-
-    return mutatant_positions_per_seq, mutatant_aas_per_seq 
+from utils.get_mutations import get_mutations
 
 
 def main(
@@ -51,7 +36,6 @@ def main(
         new_seq[HER2_CDR3_FIRST_INDEX:HER2_CDR3_LAST_INDEX] = new_cdr3 
         new_seq = "".join(new_seq)
         seqs_list.append(new_seq)
-    
 
     affinity_per_seq = df["label"].values.astype(np.float32) 
     affinity_per_seq[df["class"].values == "mid"] = 0.5 # high --> 1, low --> 0, mid --> 0.5 

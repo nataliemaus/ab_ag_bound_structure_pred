@@ -4,14 +4,22 @@ import numpy as np
 import os 
 import copy 
 import argparse 
-from utils.get_mutations import get_mutations
 from utils.refine_pose import refine_pose 
 from utils.mutate_pose import mutate_residues 
 from utils.score_pose import get_score_function
 from utils.get_spearman_coeff import get_spearman_r
 from utils.scatter_plot import scatter_plot
-from constants import PARENTAL_ID_TO_AB_SEQ, HER2_CDR3_FIRST_INDEX, HER2_CDR3_LAST_INDEX, HER2_CDR_3
+from utils.get_mutations import get_mutations
+from constants import (
+    PARENTAL_ID_TO_AB_SEQ, 
+    HER2_CDRS_LIST,
+    HER2_CDR_FIRST_INDEX_LIST,
+    HER2_CDR_LAST_INDEX_LIST,
+)
 
+# For v2, instead using Shanehsazzadeh-spr-controls.csv (more data, all 3 cdrs)
+#   then can combine data csvs with zero-shot data and see if that helps too
+#   just don't forget to change affinity measurements for zero-shot to KD (nM) from csv to match 
 
 def main(
     hdock_pose_path,
@@ -19,38 +27,51 @@ def main(
     affinity_data_path,
     parental_seq,
     results_dir,
-    affinity_data_seq_col="HCDR3",
-    affinity_data_label_col="-log(KD (M))",
-    skip_refinement=True,
+    affinity_data_seq_col=["HCDR1","HCDR2","HCDR3"],
+    affinity_data_label_col="KD (nM)",
+    skip_refinement=False,
     mutations_only=True,
 ):
     save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
     save_data_path = f"{results_dir}/{save_filename}"
 
-    df = pd.read_csv(affinity_data_path) # (422, 7)
-    len_known_cdr3 = len(HER2_CDR_3)
+    df = pd.read_csv(affinity_data_path) 
+    print("N sequences before removing non-mutations:", df.shape[0])
+    
     if mutations_only:
-        # only keep new seqs that mutate original --> same length 
-        len_new_cdr3s = [len(seq) for seq in df[affinity_data_seq_col].values]
-        len_new_cdr3s = np.array(len_new_cdr3s)
-        bool_array = len_new_cdr3s == len_known_cdr3
-        df = df[bool_array] # (201,7)
+        bool_array = np.array([True]*df.shape[0])
+        for cdr_n in [1,2,3]:
+            # len_known_cdr3 = len(HER2_CDR_3)
+            len_known_cdr = len(HER2_CDRS_LIST[cdr_n - 1]) 
+            # only keep new seqs that mutate original --> same length 
+            len_new_cdrs = [len(seq) for seq in df[affinity_data_seq_col[cdr_n - 1]].values]
+            len_new_cdrs = np.array(len_new_cdrs)
+            bool_array_cdr = len_new_cdrs == len_known_cdr
+            bool_array = np.logical_and(bool_array, bool_array_cdr)
+        df = df[bool_array] 
     else:
         assert 0, "code not prepped to handle insertions or deletions"
 
-    
-    new_cdr3s = df[affinity_data_seq_col].values # .tolist()
+    print("N sequences AFTER removing non-mutations:", df.shape[0])
+    import pdb 
+    pdb.set_trace()
+
     seqs_list = []
-    for new_cdr3 in new_cdr3s:
+    for i in range(df.shape[0]):
         new_seq = copy.deepcopy(parental_seq)
         new_seq = [char for char in new_seq]
-        new_cdr3 = [char for char in new_cdr3]
-        new_seq[HER2_CDR3_FIRST_INDEX:HER2_CDR3_LAST_INDEX] = new_cdr3 
+        for cdr_n in [1,2,3]:
+            new_cdr = df[affinity_data_seq_col[cdr_n - 1]].values[i]
+            new_cdr = [char for char in new_cdr]
+            new_seq[HER2_CDR_FIRST_INDEX_LIST[cdr_n - 1]:HER2_CDR_LAST_INDEX_LIST[cdr_n - 1]] = new_cdr  
         new_seq = "".join(new_seq)
         seqs_list.append(new_seq)
-    
 
-    affinity_per_seq = df[affinity_data_label_col].values.astype(np.float32) # (201,)
+    print("got seqs list, check it looks reasonable")
+    import pdb 
+    pdb.set_trace()
+
+    affinity_per_seq = df[affinity_data_label_col].values.astype(np.float32) 
     affinity_per_seq = affinity_per_seq.tolist()
 
     mutatant_positions_per_seq, mutatant_aas_per_seq = get_mutations(
@@ -130,7 +151,6 @@ def organize_data(
                 )
             correlation_coeffs.append(spearman_r)
             run_pose_paths.append(hdock_pose_path)
-        
 
     save_df = {}
     save_df["kd_energy_spearman_r"] = np.array(correlation_coeffs)
@@ -163,7 +183,7 @@ if __name__ == "__main__":
         "--skip_refinement",
         help=" if True, do not do any refinement",
         type=str2bool,
-        default=True,
+        default=False,
         required=False,
     ) 
     parser.add_argument(
@@ -177,16 +197,15 @@ if __name__ == "__main__":
 
     parental = "HER2"
     if args.skip_refinement:
-        results_dir = "her2/shzz_results_no_refinement"
+        results_dir = "her2/control_shzz_results_no_refinement"
     else:
-        results_dir = "her2/shzz_results"
+        results_dir = "her2/control_shzz_results" 
     if not os.path.exists(results_dir):
         os.mkdir(results_dir) 
-    
 
     if not args.organize_data: # run main with pose num 
-        parental_seq = PARENTAL_ID_TO_AB_SEQ[parental]
-        affinity_data_path = f"her2/Shanehsazzadeh-zero-shot-binders.csv"
+        parental_seq = PARENTAL_ID_TO_AB_SEQ[parental] 
+        affinity_data_path = f"her2/Shanehsazzadeh-spr-controls.csv" 
         assert args.hdock_pose_num in np.arange(1,101).tolist()
         hdock_pose_path = f"her2/hdock_her2/model_{args.hdock_pose_num}.pdb"
         main(
@@ -196,8 +215,8 @@ if __name__ == "__main__":
             parental_seq=parental_seq,
             results_dir=results_dir,
             skip_refinement=args.skip_refinement,
-            affinity_data_seq_col="HCDR3",
-            affinity_data_label_col="-log(KD (M))",
+            affinity_data_seq_col=["HCDR1","HCDR2","HCDR3"],
+            affinity_data_label_col="KD (nM)",
         )
     else: # run organize data 
         # get all hdock pdb paths 
@@ -218,13 +237,8 @@ if __name__ == "__main__":
             make_scatter_plots=make_scatter_plots,
         )
     
-    # NOTE: significant changes needed to run this for seqs with edits outside cdr3... 
-    
-    #   NOTE: can also run organize_data in the middle to see what it looks like before killing... 
+    # NOTE: can also run organize_data in the middle to see what it looks like before killing... 
 
+    # python3 control_shzz_run_pipeline_her2_parallel.py --organize_data False --hdock_pose_num 1
+    # python3 control_shzz_run_pipeline_her2_parallel.py --organize_data True  
 
-    # NOTE: pose #3 is easily best and should get best correlation hopefully 
-
-    # python3 shzz_data_run_pipeline_her2_parallel.py --organize_data False --hdock_pose_num 10
-    # python3 shzz_data_run_pipeline_her2_parallel.py --organize_data True  
-    
