@@ -37,11 +37,11 @@ python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement False --organi
 
 # RUNNING: SHZZ poses 1-100 NO refinment 
 # ab1-20 x 5 runs each --> poses 1-100 running (queue order: 1-20, 21-40, 41-60, 61-80, 81-100)
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 1
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 21
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 41
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 61
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 81
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 20
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 40
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 60
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 80
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 100
 
 # Then do: 
 python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data True 
