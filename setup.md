@@ -13,9 +13,9 @@ https://github.com/nataliemaus/ab_ag_bound_structure_pred
 
 # On Locust: 
 
-tmux attach -t ab1 - 20 
+tmux attach -t ab1 - 34
 
-runai submit ab20 -v /home/nmaus/ab_ag_bound_structure_pred:/home/nmaus/ab_ag_bound_structure_pred --working-dir /home/nmaus/ab_ag_bound_structure_pred -i haydnj/torch:bayes-lqo -g 0 -e WANDB_API_KEY=fa9b0336bc46ee548faf75673c4f4ec5b461edb4 --interactive --attach
+runai submit ab34 -v /home/nmaus/ab_ag_bound_structure_pred:/home/nmaus/ab_ag_bound_structure_pred --working-dir /home/nmaus/ab_ag_bound_structure_pred -i haydnj/torch:bayes-lqo -g 0 -e WANDB_API_KEY=fa9b0336bc46ee548faf75673c4f4ec5b461edb4 --interactive --attach
 
 runai attach ab1
 
@@ -35,15 +35,16 @@ python3 shzz_data_run_pipeline_her2_parallel.py --skip_refinement False --organi
 
 # ------------ SHZZ Controls (more data) -------------------
 
-# RUNNING: SHZZ poses 1-100 NO refinment 
-# ab1-20 x 5 runs each --> poses 1-100 running (queue order: 1-20, 21-40, 41-60, 61-80, 81-100)
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 20
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 40
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 60
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 80
-python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 100
-
-# Then do: 
+# RUNNING: SHZZ poses 1-100 NO refinment (DONE, DOWNLOADED)
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data False --hdock_pose_num 1
 python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement True --organize_data True 
 
 
+# RUNNING: SHZZ poses 1-100 WITH refinment 
+# ab1-32 x 3 runs each --> poses 1-100 running (queue order: 1-33, 34-66, 67-100)
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement False --organize_data False --hdock_pose_num 1
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement False --organize_data False --hdock_pose_num 33
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement False --organize_data False --hdock_pose_num 67 (accidently started on 66 --> repeat --> aabo34 running 98,99 )
+
+# Then do: 
+python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement False --organize_data True 
