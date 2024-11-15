@@ -72,8 +72,6 @@ def main(
         new_seq = "".join(new_seq)
         seqs_list.append(new_seq)
 
-    # Checked: seqs_list has length 1266 and each seq has length 434 but they are not equivalent to eachother 
-
     affinity_per_seq = df[affinity_data_label_col].values.astype(np.float32) 
     affinity_per_seq = affinity_per_seq.tolist()
 
