@@ -35,9 +35,14 @@ def main(
     save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
     save_data_path = f"{results_dir}/{save_filename}"
 
-    df = pd.read_csv(affinity_data_path) 
-    # print("N sequences before removing non-mutations:", df.shape[0])
-    # N sequences before removing non-mutations: 1855
+    df = pd.read_csv(affinity_data_path)  # (1855, 5)
+
+    # remove nan affinity data 
+    bool_arr = np.logical_not(np.isnan(df[affinity_data_label_col].values ))
+    df = df[bool_arr] # (758, 5)
+
+    print("N sequences before removing non-mutations:", df.shape[0])
+    # N sequences before removing non-mutations: 758
     
     if mutations_only:
         bool_array = np.array([True]*df.shape[0])
@@ -53,10 +58,11 @@ def main(
     else:
         assert 0, "code not prepped to handle insertions or deletions"
 
-    # print("N sequences AFTER removing non-mutations:", df.shape[0])
-    # N sequences AFTER removing non-mutations: 1266
+    print("N sequences AFTER removing non-mutations:", df.shape[0])
+    # N sequences AFTER removing non-mutations: ?
 
-
+    import pdb 
+    pdb.set_trace()
     seqs_list = []
     for i in range(df.shape[0]):
         new_seq = copy.deepcopy(parental_seq)
