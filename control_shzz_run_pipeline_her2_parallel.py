@@ -59,10 +59,8 @@ def main(
         assert 0, "code not prepped to handle insertions or deletions"
 
     print("N sequences AFTER removing non-mutations:", df.shape[0])
-    # N sequences AFTER removing non-mutations: ?
+    # N sequences AFTER removing non-mutations: 420
 
-    import pdb 
-    pdb.set_trace()
     seqs_list = []
     for i in range(df.shape[0]):
         new_seq = copy.deepcopy(parental_seq)
