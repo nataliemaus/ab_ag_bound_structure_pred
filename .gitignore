@@ -2,6 +2,7 @@
 *.png
 *.pdb
 *.txt
+*.zip
 pillbox/
 pillbox/* 
 __pycache__/
@@ -18,4 +19,5 @@ __pycache__/*
 her2/hdock_her2/model_*.clean.pdb
 her2/data_chinneryetal/
 her2/data_chinneryetal/* 
+!influenza/hdock_preds/model_*.pdb
 
