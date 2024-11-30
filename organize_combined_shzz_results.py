@@ -94,6 +94,6 @@ def organize_data(
 
 if __name__ == "__main__":
     organize_data(
-        skip_refinement=True,
+        skip_refinement=False,
         take_neg_log=True,
     )

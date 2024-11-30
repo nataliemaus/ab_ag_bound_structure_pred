@@ -16,3 +16,6 @@ __pycache__/*
 .DS_Store
 .DS_Store/*
 her2/hdock_her2/model_*.clean.pdb
+her2/data_chinneryetal/
+her2/data_chinneryetal/* 
+
