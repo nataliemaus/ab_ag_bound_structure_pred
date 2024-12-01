@@ -48,3 +48,17 @@ python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement False --org
 
 # Then do: 
 python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement False --organize_data True 
+
+
+
+# ------------------------ RUNNING INFLUENZA -------------------------------
+
+#       Todo: run 
+
+# Run: poses 1-100 without refinment first 
+python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 1 
+
+
+# Then do: 
+python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data True --skip_refinement True
+
