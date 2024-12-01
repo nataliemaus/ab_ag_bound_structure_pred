@@ -43,8 +43,8 @@ if __name__ == "__main__":
     # pdb_file = "../her2/known_binding_pose/ag_only.pdb"
     # pdb_file = "../her2/known_binding_pose/ab_only.pdb"
 
-    pdb_file = "../influenza/known_pose_CR9114/inf_ag_only.pdb"
-    # pdb_file = "../influenza/known_pose_CR9114/inf_ab_only.pdb"
+    # pdb_file = "../influenza/known_pose_CR9114/inf_ag_only.pdb"
+    pdb_file = "../influenza/known_pose_CR9114/inf_ab_only.pdb"
 
     # Extract and print the amino acid sequence
     amino_acid_sequence, chain_to_seq_dict = extract_sequence(pdb_file)
