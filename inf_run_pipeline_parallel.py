@@ -39,12 +39,13 @@ def main(
     # extend length of seqs out to length of parental (specific to dataset)
     split_parental = copy.deepcopy(parental_seq) 
     split_parental = [char for char in split_parental]
+    n_keep = 121 - 6 # ignore any edits in first or last 6 aa's (change from v1)
     seqs_list = []
     for new_aa_seq in seqs:
         assert len(new_aa_seq) == 121 
         split_new_seq = [char for char in new_aa_seq]
         full_new_seq = copy.deepcopy(split_parental)
-        full_new_seq[0:len(split_new_seq)] = split_new_seq
+        full_new_seq[6:n_keep] = split_new_seq[6:n_keep]
         full_new_seq = "".join(full_new_seq)
         seqs_list.append(full_new_seq)
 

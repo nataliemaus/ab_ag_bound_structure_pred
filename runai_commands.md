@@ -54,7 +54,7 @@ python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement False --org
 # ------------------------ RUNNING INFLUENZA -------------------------------
 
 
-# Running: poses 1-100 without refinment first 
+# Running: poses 1-100 without refinment first (V2! )
 # ab1-20 (5 per gpu)
 python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 96
 python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 97 
