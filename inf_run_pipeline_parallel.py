@@ -199,7 +199,7 @@ if __name__ == "__main__":
         )
     else: # run organize data 
         # get all hdock pdb paths 
-        paths_to_round1_hdock_predicted_poses = f"influenza/hdock_preds_{parental}/model_*.pdb"
+        paths_to_round1_hdock_predicted_poses = glob.glob(f"influenza/hdock_preds_{parental}/model_*.pdb")
         # remove .clean.pdb versions 
         temp = []
         for hdock_pdb_file in paths_to_round1_hdock_predicted_poses:

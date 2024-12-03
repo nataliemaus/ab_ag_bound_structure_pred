@@ -53,15 +53,14 @@ python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement False --org
 
 # ------------------------ RUNNING INFLUENZA -------------------------------
 
-#       Todo: run 
 
-# Run: poses 1-100 without refinment first 
+# Running: poses 1-100 without refinment first 
 # ab1-20 (5 per gpu)
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 1 
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 2 
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 3
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 4 
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 5 
+python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 96
+python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 97 
+python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 98
+python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 99
+python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 100 
 
 
 # Then do: 
