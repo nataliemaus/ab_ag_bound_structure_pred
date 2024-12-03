@@ -48,9 +48,6 @@ def main(
         full_new_seq = "".join(full_new_seq)
         seqs_list.append(full_new_seq)
 
-    import pdb 
-    pdb.set_trace()
-
     mutatant_positions_per_seq, mutatant_aas_per_seq = get_mutations(
         parental_seq=parental_seq,
         seqs_list=seqs_list,
