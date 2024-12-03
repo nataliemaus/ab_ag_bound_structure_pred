@@ -22,3 +22,4 @@ her2/data_chinneryetal/*
 !influenza/hdock_preds/model_*.pdb
 !influenza/zenodo_affinity_data/phillips_et_al_processed/CR9114/all_combined_data.csv
 !influenza/hdock_preds_CR9114/*.pdb
+influenza/hdock_preds_CR9114/model_*.clean.pdb
