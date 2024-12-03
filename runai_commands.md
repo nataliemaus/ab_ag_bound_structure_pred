@@ -68,3 +68,10 @@ python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data Fa
 # Then do: 
 python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data True --skip_refinement True
 
+
+# TODO next:: 
+# Are other affinity data columns better? 
+# **Just compute energy without refinement for all seqs in data 
+#   + save all relevant affinity cols in final cvs
+#       Then see if we can find any correlations whatsoever using various combinations of 
+#       affinity data columns and cutoffs (i.e. only >6.0, 6.5)
