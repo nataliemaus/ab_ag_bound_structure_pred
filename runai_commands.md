@@ -54,15 +54,17 @@ python3 control_shzz_run_pipeline_her2_parallel.py --skip_refinement False --org
 # ------------------------ RUNNING INFLUENZA -------------------------------
 
 
-# Running: poses 1-100 without refinment first (V2! )
+# Running: poses 1-100 without refinment first 
+# V1 looked bad, now trying V2 where we ignore any mutations in first or last 6 aa's (V2), if this is bad maybe there's something else wrong going on? 
 # ab1-20 (5 per gpu)
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 96
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 97 
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 98
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 99
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 100 
+# Kicked off Tuesday Dec 3rd 7:25am 
+python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data False --skip_refinement True --hdock_pose_num 20
+python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data False --skip_refinement True --hdock_pose_num 40
+python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data False --skip_refinement True --hdock_pose_num 60
+python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data False --skip_refinement True --hdock_pose_num 80
+python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data False --skip_refinement True --hdock_pose_num 100
 
 
 # Then do: 
-python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data True --skip_refinement True
+python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data True --skip_refinement True
 

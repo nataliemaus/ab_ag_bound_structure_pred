@@ -176,7 +176,8 @@ if __name__ == "__main__":
         required=False,
     )
     args = parser.parse_args() 
-    assert args.num_affinity_data <= 600 # Otherwise highest affinity data bin represents smaller amount of data
+    if args.num_affinity_data > 600: # Otherwise highest affinity data bin represents smaller amount of data
+        print(f"Warning: highest affinity data bin represents smaller amount of data than other bins with N={args.num_affinity_data}>600")
 
     parental = "CR9114"
     results_dir = f"influenza/{parental}_N{args.num_affinity_data}"
