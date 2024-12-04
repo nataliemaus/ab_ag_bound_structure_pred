@@ -75,3 +75,12 @@ python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data Tr
 #   + save all relevant affinity cols in final cvs
 #       Then see if we can find any correlations whatsoever using various combinations of 
 #       affinity data columns and cutoffs (i.e. only >6.0, 6.5)
+
+
+# Version with all seqs and save all affinity data:
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 1 
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 21 
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 41 
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 61 
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 81 
+ 
