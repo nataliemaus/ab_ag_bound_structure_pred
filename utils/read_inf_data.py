@@ -1,6 +1,6 @@
 import pandas as pd 
 import numpy as np 
-
+QUICK_DEBUG = True 
 
 def load_influenza_affinity_data(
     inf_dir="../influenza",
@@ -28,7 +28,12 @@ def load_influenza_affinity_data(
     if get_all_affinity_labels_and_seqs: 
         affinity_labels_dict = {}
         for affinity_label in all_affinity_labels:
-            affinity_labels_dict[affinity_label] = df[affinity_label].values
+            affinity_data_array = df[affinity_label].values
+            if QUICK_DEBUG:
+                affinity_data_array = affinity_data_array[0:5]
+            affinity_labels_dict[affinity_label] = affinity_data_array
+        if QUICK_DEBUG:
+            seqs = seqs[0:5]
         return seqs, affinity_labels_dict
 
     

@@ -78,6 +78,7 @@ python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data Tr
 
 
 # Version with all seqs and save all affinity data:
+#   running ab1-20 x 5 poses each 
 python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 1 
 python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 21 
 python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 41 
