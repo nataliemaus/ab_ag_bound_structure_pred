@@ -23,6 +23,7 @@ def main(
     parental="CR9114",
     ag_h_num=3,
     N_affinity_data_points=600,
+    use_all_affinity_data_and_seqs=True,
 ):
     save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
     save_data_path = f"{results_dir}/{save_filename}"
@@ -32,8 +33,10 @@ def main(
         ab_parental=parental,
         ag_h_num=ag_h_num,
         N_load=N_affinity_data_points, 
+        get_all_affinity_labels_and_seqs=use_all_affinity_data_and_seqs,
     )
-    affinity_per_seq = affinity_per_seq.tolist()
+    if not use_all_affinity_data_and_seqs:
+        affinity_per_seq = affinity_per_seq.tolist()
     seqs = seqs.tolist() 
 
     # extend length of seqs out to length of parental (specific to dataset)
@@ -75,19 +78,28 @@ def main(
         binding_energy = energy_sfxn(refined_pose) 
         binding_energies_per_seq.append(binding_energy)
 
-        n_so_far = len(binding_energies_per_seq)
-        be_array_so_far = np.array(binding_energies_per_seq)
-        affinities_so_far = np.array(affinity_per_seq[0:n_so_far])
-        if n_so_far > 2:
-            spearman_r_so_far = get_spearman_r(affinities_so_far,be_array_so_far)
-        else:
-            spearman_r_so_far = -100
+        
+        if not use_all_affinity_data_and_seqs:
+            n_so_far = len(binding_energies_per_seq)
+            be_array_so_far = np.array(binding_energies_per_seq)
+            # compute spearman r and save as you go 
+            affinities_so_far = np.array(affinity_per_seq[0:n_so_far])
+            if n_so_far > 2:
+                spearman_r_so_far = get_spearman_r(affinities_so_far,be_array_so_far)
+            else:
+                spearman_r_so_far = -100
 
-        save_df = {}
-        save_df["energy"] = be_array_so_far
-        save_df["affinity"] = affinities_so_far
-        save_df["spearman_r"] = np.array([spearman_r_so_far]*n_so_far)
-        save_df = pd.DataFrame.from_dict(save_df)
+            save_df = {}
+            save_df["energy"] = be_array_so_far
+            save_df["affinity"] = affinities_so_far
+            save_df["spearman_r"] = np.array([spearman_r_so_far]*n_so_far)
+            save_df = pd.DataFrame.from_dict(save_df)
+            save_df.to_csv(save_data_path, index=None)
+    
+    if use_all_affinity_data_and_seqs:
+        # affinity_per_seq in this case is already a dict of affinity np arrays 
+        affinity_per_seq["energy"] = np.array(binding_energies_per_seq)
+        save_df = pd.DataFrame.from_dict(affinity_per_seq)
         save_df.to_csv(save_data_path, index=None)
 
 
@@ -169,6 +181,13 @@ if __name__ == "__main__":
         required=False,
     ) 
     parser.add_argument(
+        "--use_all_affinity_data_and_seqs",
+        help=" if True, run on all sequences rather than num_affinity_data + save all affinity data cols",
+        type=str2bool,
+        default=False,
+        required=False,
+    ) 
+    parser.add_argument(
         "--num_affinity_data",
         help="  how many affinity data points to use.",
         type=int,
@@ -176,11 +195,17 @@ if __name__ == "__main__":
         required=False,
     )
     args = parser.parse_args() 
+    if args.use_all_affinity_data_and_seqs:
+        assert not args.organize_data, "TODO: make version of organize_data compatible with all affinity data and seqs (new script?)"
+        assert args.skip_refinement, "The entire dataset is too much to feasible do with refinement"
     if args.num_affinity_data > 600: # Otherwise highest affinity data bin represents smaller amount of data
         print(f"Warning: highest affinity data bin represents smaller amount of data than other bins with N={args.num_affinity_data}>600")
 
     parental = "CR9114"
-    results_dir = f"influenza/{parental}_N{args.num_affinity_data}"
+    if args.use_all_affinity_data_and_seqs:
+        results_dir = f"influenza/{parental}_all_seqs_and_affinity_data"
+    else:
+        results_dir = f"influenza/{parental}_N{args.num_affinity_data}"
 
     if args.skip_refinement:
         results_dir = results_dir + "_no_refinement"
@@ -198,6 +223,7 @@ if __name__ == "__main__":
             results_dir=results_dir,
             skip_refinement=args.skip_refinement,
             N_affinity_data_points=args.num_affinity_data,
+            use_all_affinity_data_and_seqs=args.use_all_affinity_data_and_seqs,
         )
     else: # run organize data 
         # get all hdock pdb paths 

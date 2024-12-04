@@ -7,22 +7,37 @@ def load_influenza_affinity_data(
     ab_parental="CR9114",
     ag_h_num=3,
     N_load=600,
+    get_all_affinity_labels_and_seqs=False,
 ): 
     assert ab_parental == "CR9114", "hdock poses only computed for CR9114, not yet for CR6261"
-    assert ag_h_num == 3, "hdock poses only computed for CR9114 + H3 Influenza AG so far"
+    all_affinity_labels = ['h1_mean', 'h3_mean', 'fluB_mean', 'h1_label', 'h3_label', 'fluB_label']
     data_dir = f"{inf_dir}/zenodo_affinity_data/phillips_et_al_processed/{ab_parental}"
-    df = pd.read_csv(f"{data_dir}/all_combined_data.csv")
+    df = pd.read_csv(f"{data_dir}/all_combined_data.csv") #  (65536,) 
+    if get_all_affinity_labels_and_seqs:
+        print(f"N_load={N_load} is irrelevant since get_all_affinity_labels_and_seqs=True")
+        print(f"Loading all N={df.shape[0]} seqs and labels ...")
+    else:
+        assert ag_h_num == 3, "hdock poses only computed for CR9114 + H3 Influenza AG so far"
+
+    # remove mutations (seqs not equal to length 121)
+    lengths = np.array([len(seq) for seq in df['H_seq'].values]) # (600,)
+    len_bool_arr = lengths == 121 
+    df = df[len_bool_arr] # (65536,)
     seqs = df['H_seq'].values #  (65536,) 
+
+    if get_all_affinity_labels_and_seqs: 
+        affinity_labels_dict = {}
+        for affinity_label in all_affinity_labels:
+            affinity_labels_dict[affinity_label] = df[affinity_label].values
+        return seqs, affinity_labels_dict
+
+    
+    # Otherwise use f"h{ag_h_num}_mean" labels and get roughly equal number per affinity bin... 
     affinities = df[f"h{ag_h_num}_mean"].values # (65536,)
     # remove nan affinities 
     bool_arr = np.logical_not(np.isnan(affinities))
     seqs = seqs[bool_arr] # (65535,)
     affinities = affinities[bool_arr] # (65535,)
-    # remove mutations (seqs not equal to length 121)
-    lengths = np.array([len(seq) for seq in seqs]) # (600,)
-    bool_arr = lengths == 121 
-    seqs = seqs[bool_arr] # (65535,)
-    affinities = affinities[bool_arr] # (65535,) 
     #   None removed, all have same length of 121 
     # Get a balanced dataset with good number in each affinity range 
     # NOTE: this is catered to the CR9114 + ag_h_num=3 dataset, re-examine bins for others
