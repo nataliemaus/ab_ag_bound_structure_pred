@@ -69,19 +69,18 @@ python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data Fa
 python3 inf_run_pipeline_parallel.py --num_affinity_data 1000 --organize_data True --skip_refinement True
 
 
-# TODO next:: 
-# Are other affinity data columns better? 
-# **Just compute energy without refinement for all seqs in data 
-#   + save all relevant affinity cols in final cvs
-#       Then see if we can find any correlations whatsoever using various combinations of 
-#       affinity data columns and cutoffs (i.e. only >6.0, 6.5)
 
 
 # Version with all seqs and save all affinity data:
 #   running ab1-20 x 5 poses each 
-python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 1 
-python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 21 
-python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 41 
-python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 61 
-python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 81 
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 20
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 40 
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 60 
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 80 
+python3 inf_run_pipeline_parallel.py --organize_data False --use_all_affinity_data_and_seqs True --skip_refinement True --hdock_pose_num 100
  
+# TODO NEXT
+# 1. never version of organize data to compute spearman_r's and plots 
+#       using different combos of affinity cols and ranges of values 
+#       can we get good correlations for any? (i.e. only >6.0, 6.5)
+#       can do locally! 

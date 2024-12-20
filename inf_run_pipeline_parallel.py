@@ -196,7 +196,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args() 
     if args.use_all_affinity_data_and_seqs:
-        assert not args.organize_data, "TODO: make version of organize_data compatible with all affinity data and seqs (new script?)"
+        assert not args.organize_data, "run influenza_all_data_organize_v2.py instead to organize all data version"
         assert args.skip_refinement, "The entire dataset is too much to feasible do with refinement"
     if args.num_affinity_data > 600: # Otherwise highest affinity data bin represents smaller amount of data
         print(f"Warning: highest affinity data bin represents smaller amount of data than other bins with N={args.num_affinity_data}>600")
@@ -243,7 +243,7 @@ if __name__ == "__main__":
             save_correlations_csv_path=save_correlations_csv_path,
             make_scatter_plots=make_scatter_plots,
         )
-    
+        
     # NOTE: can also run organize_data in the middle to see what it looks like before killing... 
 
     # python3 inf_run_pipeline_parallel.py --num_affinity_data 600 --organize_data False --skip_refinement True --hdock_pose_num 1 
