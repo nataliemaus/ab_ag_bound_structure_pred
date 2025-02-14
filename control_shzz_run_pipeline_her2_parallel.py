@@ -182,7 +182,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--skip_refinement",
-        help=" if True, do not do any refinement",
+        help="  if True, do not do any refinement (refinement is the slowest step, skip to quick testing if env/setup works)",
         type=str2bool,
         default=False,
         required=False,

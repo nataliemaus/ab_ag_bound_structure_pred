@@ -21,7 +21,7 @@ def main(
     results_dir,
     affinity_data_seq_col="HCDR3",
     affinity_data_label_col="-log(KD (M))",
-    skip_refinement=True,
+    skip_refinement=False,
     mutations_only=True,
 ):
     save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
@@ -161,9 +161,9 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--skip_refinement",
-        help=" if True, do not do any refinement",
+        help=" if True, do not do any refinement (refinement is the slowest step, skip to quick testing if env/setup works)",
         type=str2bool,
-        default=True,
+        default=False,
         required=False,
     ) 
     parser.add_argument(

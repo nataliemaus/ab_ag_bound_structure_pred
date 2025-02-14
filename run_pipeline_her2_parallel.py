@@ -19,7 +19,7 @@ def main(
     affinity_data_path,
     parental_seq,
     results_dir,
-    skip_refinement=True,
+    skip_refinement=False,
 ):
     assert 0, "make sure to switch cdr3 in constants back to length 10 one for this dataset!"
     save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
@@ -149,9 +149,9 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--skip_refinement",
-        help=" if True, do not do any refinement",
+        help="  if True, do not do any refinement (refinement is the slowest step, skip to quick testing if env/setup works)",
         type=str2bool,
-        default=True,
+        default=False,
         required=False,
     ) 
     parser.add_argument(

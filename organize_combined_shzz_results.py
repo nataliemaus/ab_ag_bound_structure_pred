@@ -15,7 +15,7 @@ def kd_nM_to_neglog_kd_M(kd_nM):
 
 
 def organize_data(
-    skip_refinement=True,
+    skip_refinement=False,
     take_neg_log=True,
 ):
     make_scatter_plots=True
