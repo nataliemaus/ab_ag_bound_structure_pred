@@ -124,20 +124,24 @@ def organize_data(
     # for each pose in list, compute kd-energy spearman correlation coeff 
     save_plots_dir = f"{results_dir}/plots/"
     correlation_coeffs = []
-    run_pose_paths = [] # paths to poses we've actually run main on to collect data 
+    hdock_pose_numbers = [] # hdock model numbers we've actually run main on to collect data 
     for hdock_pose_path in hdock_pose_paths_list:
-        pose_data_path = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
-        pose_data_path = f"{results_dir}/{pose_data_path}"
+        # pose_data_path = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
+        # pose_data_path = f"{results_dir}/{pose_data_path}"
+        hdock_pose_number = int(hdock_pose_path.split("/")[-1].split("_")[-1].replace(".pdb", ""))
+        hdock_pose_numbers.append(hdock_pose_number)
+        pose_data_filename = f"hdock_model_{hdock_pose_number}_results.csv"
+        pose_data_path = f"{results_dir}/{pose_data_filename}"
         if os.path.exists(pose_data_path):
             pose_df = pd.read_csv(pose_data_path)
-            binding_energies_per_seq = pose_df["energy"].values 
-            affinity_per_seq = pose_df["affinity"].values 
+            binding_energies_per_seq = pose_df["rosetta-energy"].values 
+            affinity_per_seq = pose_df["known-affinity"].values 
             spearman_r = get_spearman_r(affinity_per_seq,binding_energies_per_seq)
         
             if make_scatter_plots:
-                plot_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".png")
+                # plot_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".png")
+                plot_filename = pose_data_filename.replace(".csv", ".png")
                 rounded_spearman_r = round(spearman_r, 3)
-                
                 if not os.path.exists(save_plots_dir):
                     os.mkdir(save_plots_dir) 
                 scatter_plot( 
@@ -149,12 +153,12 @@ def organize_data(
                     path_to_save_plot=f"{save_plots_dir}{plot_filename}", 
                 )
             correlation_coeffs.append(spearman_r)
-            run_pose_paths.append(hdock_pose_path)
+            # run_pose_paths.append(hdock_pose_path)
         
 
     save_df = {}
     save_df["kd_energy_spearman_r"] = np.array(correlation_coeffs)
-    save_df["pose_path"] = np.array(run_pose_paths)
+    save_df["hdock_pose_number"] = np.array(hdock_pose_numbers)
     save_df = pd.DataFrame.from_dict(save_df)
     save_df = save_df.sort_values(by=["kd_energy_spearman_r"], ascending=False)
     save_df.to_csv(save_correlations_csv_path, index=None)
