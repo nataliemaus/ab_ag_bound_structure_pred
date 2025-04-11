@@ -244,7 +244,6 @@ if __name__ == "__main__":
             results_dir=results_dir, 
             save_correlations_csv_path=save_correlations_csv_path,
             make_scatter_plots=make_scatter_plots,
-            save_pdbs=args.save_pdbs,
         )
     
     # NOTE: significant changes needed to run this for seqs with edits outside cdr3... 
