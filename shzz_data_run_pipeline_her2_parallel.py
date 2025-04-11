@@ -23,9 +23,16 @@ def main(
     affinity_data_label_col="-log(KD (M))",
     skip_refinement=False,
     mutations_only=True,
+    save_pdbs=False, # new addition so I can send Ani intermediate PDBs to send through new model
 ):
-    save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
+    hdock_pose_number = int(hdock_pose_path.split("/")[-1].split("_")[-1].replace(".pdb", ""))
+    # save_filename = hdock_pose_path.split("/")[-1].replace(".pdb", ".csv")
+    save_filename = f"hdock_model_{hdock_pose_number}_results.csv"
     save_data_path = f"{results_dir}/{save_filename}"
+    if save_pdbs:
+        save_pdbs_dir = f"{results_dir}/hdock_model_{hdock_pose_number}_pdbs/"
+        if not os.path.exists(save_pdbs_dir):
+            os.mkdir(save_pdbs_dir) 
 
     df = pd.read_csv(affinity_data_path) # (422, 7)
     len_known_cdr3 = len(HER2_CDR_3)
@@ -61,7 +68,10 @@ def main(
     energy_sfxn = get_score_function()
 
     binding_energies_per_seq = []
+    mutated_pdb_paths_per_seq = []
+    seq_number = 0
     for ix, mutatnt_positions_list in enumerate(mutatant_positions_per_seq):
+        seq_number += 1
         mutated_pose = mutate_residues(
             path_to_pdb=hdock_pose_path,
             parental=parental,
@@ -76,9 +86,17 @@ def main(
                 parental=parental,
                 pose=mutated_pose,
             ) 
+        # get binding energy
         binding_energy = energy_sfxn(refined_pose) 
+        # save mutated and refined pose as pdb 
+        if save_pdbs:
+            save_pdb_filename = f"hdock{hdock_pose_number}_mutated_pose_{seq_number}.pdb"
+            refined_pose.dump_pdb(f"{save_pdbs_dir}{save_pdb_filename}") 
+            # TODO: save redfined pose 
+            mutated_pdb_paths_per_seq.append(save_pdb_filename)
+        
+        # update and save data collected 
         binding_energies_per_seq.append(binding_energy)
-
         n_so_far = len(binding_energies_per_seq)
         be_array_so_far = np.array(binding_energies_per_seq)
         affinities_so_far = np.array(affinity_per_seq[0:n_so_far])
@@ -86,11 +104,13 @@ def main(
             spearman_r_so_far = get_spearman_r(affinities_so_far,be_array_so_far)
         else:
             spearman_r_so_far = -100
-
+        # save to csv every loop so we have everything we've done so far if killed early 
         save_df = {}
-        save_df["energy"] = be_array_so_far
-        save_df["affinity"] = affinities_so_far
+        save_df["rosetta-energy"] = be_array_so_far
+        save_df["known-affinity"] = affinities_so_far
         save_df["spearman_r"] = np.array([spearman_r_so_far]*n_so_far)
+        if save_pdbs:
+            save_df["mutated_pdb"] = np.array(mutated_pdb_paths_per_seq)
         save_df = pd.DataFrame.from_dict(save_df)
         save_df.to_csv(save_data_path, index=None)
 
@@ -173,6 +193,13 @@ if __name__ == "__main__":
         default=False,
         required=False,
     ) 
+    parser.add_argument(
+        "--save_pdbs",
+        help=" if True, run data organization rather than main",
+        type=str2bool,
+        default=False,
+        required=False,
+    ) 
     args = parser.parse_args() 
 
     parental = "HER2"
@@ -198,6 +225,7 @@ if __name__ == "__main__":
             skip_refinement=args.skip_refinement,
             affinity_data_seq_col="HCDR3",
             affinity_data_label_col="-log(KD (M))",
+            save_pdbs=args.save_pdbs,
         )
     else: # run organize data 
         # get all hdock pdb paths 
@@ -216,6 +244,7 @@ if __name__ == "__main__":
             results_dir=results_dir, 
             save_correlations_csv_path=save_correlations_csv_path,
             make_scatter_plots=make_scatter_plots,
+            save_pdbs=args.save_pdbs,
         )
     
     # NOTE: significant changes needed to run this for seqs with edits outside cdr3... 
